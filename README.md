@@ -28,19 +28,19 @@ texts := []string{
 }
 
 for _, text := range texts {
-    fmt.Println(text)
-    result, _ := contentModerationHandler.SensitiveWordsDetection(ctx, text)
-    fmt.Println(result)
+    fmt.Println("text: " + text)
+	result, _ := contentModerationHandler.SensitiveWordsDetection(ctx, text)
+	fmt.Println("sensitive words dectection: " + fmt.Sprintf("%v", result))
 }
 ```
 result:
 ```bash
-我不要听话
-false
-you are so stupid
-true
-每天早起做愛心便當
-false
-この野郎！
-true
+text: 我不要听话
+sensitive words dectection: false
+text: you are so stupid
+sensitive words dectection: true
+text: 每天早起做愛心便當
+sensitive words dectection: false
+text: この野郎！
+sensitive words dectection: true
 ```
