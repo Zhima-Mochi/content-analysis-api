@@ -20,7 +20,7 @@ func SensitiveWordsDetectionPromptGenerator(text string) string {
 // ContentClassificationPromptGenerator generates a prompt for the Content Classification task.
 func ContentClassificationPromptGenerator(text string) string {
 	return `
-		## Classifying the content only one category (unknown category is allowed)
+		## Classifying the content only one category (unknown category is not allowed)
 		#### Input
 		- text: string
 		#### Output
