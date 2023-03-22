@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
 	"os"
 
 	contentModeration "github.com/Zhima-Mochi/content-moderation-api/content-moderation"
@@ -27,12 +26,18 @@ func main() {
 		"この野郎！",
 	}
 	for _, text := range texts {
-		fmt.Println(text)
-		result, err := contentModerationHandler.SensitiveWordsDetection(ctx, text)
+		fmt.Println("text: " + text)
+		result1, err := contentModerationHandler.SensitiveWordsDetection(ctx, text)
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println(err)
 			return
 		}
-		fmt.Println(result)
+		fmt.Println("sensitive words dectection: " + fmt.Sprintf("%v", result1))
+		result2, err := contentModerationHandler.ContentClassification(ctx, text)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		fmt.Println("content classification: " + fmt.Sprintf("%v", result2))
 	}
 }

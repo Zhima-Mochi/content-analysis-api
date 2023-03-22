@@ -16,3 +16,20 @@ func SensitiveWordsDetectionPromptGenerator(text string) string {
 		- is_sensitive:
 	`
 }
+
+// ContentClassificationPromptGenerator generates a prompt for the Content Classification task.
+func ContentClassificationPromptGenerator(text string) string {
+	return `
+		## Classifying the content
+		#### Input
+		- text: string
+		#### Output
+		- category: string
+		#### Example
+		- text: I want to be a good person
+		- category: positive
+		#### Prompt
+		- text: ` + text + `
+		- category:
+	`
+}

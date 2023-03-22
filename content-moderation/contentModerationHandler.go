@@ -13,6 +13,7 @@ type ContentModerationHandler struct {
 	model                                  string
 	temperature                            float32
 	sensitiveWordsDetectionPromptGenerator func(text string) string
+	contentClassificationGenerator         func(text string) string
 }
 
 func NewContentModerationHandler(client *openai.Client) *ContentModerationHandler {
@@ -21,6 +22,7 @@ func NewContentModerationHandler(client *openai.Client) *ContentModerationHandle
 		model:                                  openai.GPT3Dot5Turbo0301,
 		temperature:                            0.5,
 		sensitiveWordsDetectionPromptGenerator: utils.SensitiveWordsDetectionPromptGenerator,
+		contentClassificationGenerator:         utils.ContentClassificationPromptGenerator,
 	}
 }
 
@@ -44,11 +46,6 @@ func (h *ContentModerationHandler) GetTemperature() float32 {
 	return h.temperature
 }
 
-// SetSensitiveWordsDetectionPromptGenerator sets the prompt generator for the Sensitive Words Detection task.
-func (h *ContentModerationHandler) SetSensitiveWordsDetectionPromptGenerator(generator func(text string) string) {
-	h.sensitiveWordsDetectionPromptGenerator = generator
-}
-
 // contentGeneration generates content based on the prompt.
 func (h *ContentModerationHandler) contentGeneration(ctx context.Context, prompt string) (string, error) {
 	req := openai.ChatCompletionRequest{
@@ -70,6 +67,32 @@ func (h *ContentModerationHandler) contentGeneration(ctx context.Context, prompt
 	return resp.Choices[0].Message.Content, nil
 }
 
+// SetSensitiveWordsDetectionPromptGenerator sets the prompt generator for the Sensitive Words Detection task.
+// The default prompt generator is utils.SensitiveWordsDetectionPromptGenerator.
+// The prompt generator should be a function that takes a string as input and returns a string as output.
+// The input string is the text to be judged.
+// The output string is the prompt.
+// For example:
+//
+//	func SensitiveWordsDetectionPromptGenerator(text string) string {
+//		return `
+//			## Judging the sensitivity of the text
+//			#### Input
+//			- text: string
+//			#### Output
+//			- is_sensitive: bool
+//			#### Example
+//			- text: fuck
+//			- is_sensitive: true
+//			#### Prompt
+//			- text: ` + text + `
+//			- is_sensitive:
+//		`
+//	}
+func (h *ContentModerationHandler) SetSensitiveWordsDetectionPromptGenerator(generator func(text string) string) {
+	h.sensitiveWordsDetectionPromptGenerator = generator
+}
+
 // SensitiveWordsDetection detects sensitive words in the text.
 func (h *ContentModerationHandler) SensitiveWordsDetection(ctx context.Context, text string) (bool, error) {
 	prompt := h.sensitiveWordsDetectionPromptGenerator(text)
@@ -88,8 +111,41 @@ func (h *ContentModerationHandler) SensitiveWordsDetection(ctx context.Context, 
 	return false, ErrInvalidAnswer
 }
 
+// SetContentClassificationGenerator sets the prompt generator for the Content Classification task.
+// The default prompt generator is utils.ContentClassificationPromptGenerator.
+// The prompt generator should be a function that takes a string as input and returns a string as output.
+// The input string is the text to be judged.
+// The output string is the prompt.
+// For example:
+//
+//	func ContentClassificationPromptGenerator(text string) string {
+//		return `
+//			## Judging the classification of the text
+//			#### Input
+//			- text: string
+//			#### Output
+//			- classification: string
+//			#### Example
+//			- text: I want to be a doctor.
+//			- classification: career
+//			#### Prompt
+//			- text: ` + text + `
+//			- classification:
+//		`
+//	}
+func (h *ContentModerationHandler) SetContentClassificationGenerator(generator func(text string) string) {
+	h.contentClassificationGenerator = generator
+}
+
+// ContentClassification classifies the text.
 func (h *ContentModerationHandler) ContentClassification(ctx context.Context, text string) (string, error) {
-	return "", nil
+	prompt := h.contentClassificationGenerator(text)
+	answer, err := h.contentGeneration(ctx, prompt)
+	if err != nil {
+		return "", err
+	}
+
+	return answer, nil
 }
 
 func (h *ContentModerationHandler) SpamDetection(ctx context.Context, text string) (bool, error) {
