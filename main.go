@@ -24,6 +24,7 @@ func main() {
 		"you are so stupid",
 		"每天早起做愛心便當",
 		"この野郎！",
+		"幹你娘",
 	}
 	for _, text := range texts {
 		fmt.Println("text: " + text)
@@ -33,11 +34,11 @@ func main() {
 			return
 		}
 		fmt.Println("sensitive words dectection: " + fmt.Sprintf("%v", result1))
-		result2, err := contentModerationHandler.ContentClassification(ctx, text)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-		fmt.Println("content classification: " + fmt.Sprintf("%v", result2))
+		// result2, err := contentModerationHandler.ContentClassification(ctx, text)
+		// if err != nil {
+		// 	fmt.Println(err)
+		// 	return
+		// }
+		// fmt.Println("content classification: " + fmt.Sprintf("%v", result2))
 	}
 }
