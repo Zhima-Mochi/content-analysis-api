@@ -29,8 +29,8 @@ texts := []string{
 
 for _, text := range texts {
     fmt.Println("text: " + text)
-	result, _ := contentModerationHandler.SensitiveWordsDetection(ctx, text)
-	fmt.Println("sensitive words dectection: " + fmt.Sprintf("%v", result))
+    result, _ := contentModerationHandler.SensitiveWordsDetection(ctx, text)
+    fmt.Println("sensitive words dectection: " + fmt.Sprintf("%v", result))
 }
 ```
 result:
