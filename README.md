@@ -14,18 +14,19 @@ go get github.com/Zhima-Mochi/content-moderation-api
 ```go
 ctx := context.Background()
 texts := []string{
-    "哇操",
-    "我不要乖乖聽話",
-    "每天早起做愛心便當",
+    "我不要听话",
+	"you are so stupid",
+	"每天早起做愛心便當",
+    "この野郎！",
 }
 for _, text := range texts {
-    log.Println(text)
+    fmt.Println(text)
     result, err := contentModerationHandler.SensitiveWordsDetection(ctx, text)
     if err != nil {
         log.Fatal(err)
         return
     }
-    log.Println(result)
+    fmt.Println(result)
 }
 ```
 output:
