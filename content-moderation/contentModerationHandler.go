@@ -14,6 +14,7 @@ type ContentModerationHandler struct {
 	temperature                            float32
 	sensitiveWordsDetectionPromptGenerator func(text string) string
 	contentClassificationGenerator         func(text string) string
+	spamDetectionPromptGenerator           func(text string) string
 }
 
 func NewContentModerationHandler(client *openai.Client) *ContentModerationHandler {
@@ -23,6 +24,7 @@ func NewContentModerationHandler(client *openai.Client) *ContentModerationHandle
 		temperature:                            0.5,
 		sensitiveWordsDetectionPromptGenerator: utils.SensitiveWordsDetectionPromptGenerator,
 		contentClassificationGenerator:         utils.ContentClassificationPromptGenerator,
+		spamDetectionPromptGenerator:           utils.SpamDetectionPromptGenerator,
 	}
 }
 
@@ -146,6 +148,11 @@ func (h *ContentModerationHandler) ContentClassification(ctx context.Context, te
 	}
 
 	return answer, nil
+}
+
+// SetSpamDetectionPromptGenerator sets the prompt generator for the Spam Detection task.
+func (h *ContentModerationHandler) SetSpamDetectionPromptGenerator(generator func(text string) string) {
+	h.spamDetectionPromptGenerator = generator
 }
 
 func (h *ContentModerationHandler) SpamDetection(ctx context.Context, text string) (bool, error) {

@@ -33,3 +33,39 @@ func ContentClassificationPromptGenerator(text string) string {
 		- category:
 	`
 }
+
+func SpamDetectionPromptGenerator(text string) string {
+	return `
+		## Spam Detection
+		#### Input
+		- text: string
+		#### Output
+		- is_spam: bool
+		#### Example
+		- text: Discount! Buy now!
+		- is_spam: true
+		- text: destination! Click here to claim your prize now!
+		- is_spam: true
+		- text: Act now and get rich quick with this amazing investment opportunity! Don't miss out on your chance to make millions!
+		- is_spam: true
+		- text: Urgent message: Your account has been compromised! Click here to reset your password and secure your account.
+		- is_spam: true
+		- text: Limited time offer: Buy one get one free on all products! Don't wait, take advantage of this incredible deal now!
+		- is_spam: true
+		- text: You have been selected to participate in a survey and receive a free gift card! Click here to start the survey and claim your reward.
+		- is_spam: true
+		- text: Reminder: Your dentist appointment is tomorrow at 2 PM. Please arrive 10 minutes early to fill out paperwork.
+		- is_spam: false
+		- text: Your order has been shipped and is expected to arrive on Friday. Click here to track your package.
+		- is_spam: false
+		- text: Thank you for your recent purchase! We hope you enjoy your new product. Please let us know if you have any questions or concerns.
+		- is_spam: false
+		- text: The school board meeting is scheduled for next Wednesday at 7 PM. All are welcome to attend and provide feedback on the proposed changes.
+		- is_spam: false
+		- text: Congratulations on your recent promotion! We are excited to see you continue to excel in your new role.
+		- is_spam: false
+		#### Prompt
+		- text: ` + text + `
+		- is_spam:
+	`
+}
