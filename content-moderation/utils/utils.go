@@ -1,5 +1,7 @@
 package utils
 
+import "github.com/sashabaranov/go-openai"
+
 // SensitiveWordsDetectionPromptGenerator generates a prompt for the Sensitive Words Detection task.
 func SensitiveWordsDetectionPromptGenerator(text string) string {
 	return `
@@ -68,4 +70,10 @@ func SpamDetectionPromptGenerator(text string) string {
 		- text: ` + text + `
 		- is_spam:
 	`
+}
+
+func Judge(response openai.ModerationResponse) bool {
+	categories := response.Results[0].Categories
+	scores := response.Results[0].CategoryScores
+	return !(categories.Hate || categories.HateThreatening || categories.SelfHarm || categories.Sexual || categories.SexualMinors || categories.Violence || scores.Sexual > 0.01)
 }

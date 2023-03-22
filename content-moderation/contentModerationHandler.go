@@ -30,6 +30,10 @@ func NewContentModerationHandler(client *openai.Client) *ContentModerationHandle
 	}
 }
 
+func (h *ContentModerationHandler) SetModerationHandlerJudge(judge func(openai.ModerationResponse) bool) {
+	h.moderationHandler.SetJudge(judge)
+}
+
 // SetModel sets the model of the ContentModerationHandler.
 func (h *ContentModerationHandler) SetModel(model string) {
 	h.model = model
@@ -94,6 +98,9 @@ func (h *ContentModerationHandler) contentGeneration(ctx context.Context, prompt
 //		`
 //	}
 func (h *ContentModerationHandler) SetSensitiveWordsDetectionPromptGenerator(generator func(text string) string) {
+	if generator == nil {
+		return
+	}
 	h.sensitiveWordsDetectionPromptGenerator = generator
 }
 
@@ -101,15 +108,13 @@ func (h *ContentModerationHandler) SetSensitiveWordsDetectionPromptGenerator(gen
 func (h *ContentModerationHandler) SensitiveWordsDetection(ctx context.Context, text string) (bool, error) {
 	// two-stage detection
 	answer := "true"
-	if h.sensitiveWordsDetectionPromptGenerator != nil {
-		var err error
-		prompt := h.sensitiveWordsDetectionPromptGenerator(text)
-		answer, err = h.contentGeneration(ctx, prompt)
-		if err != nil {
-			return false, err
-		}
-		answer = strings.ToLower(answer)
+	var err error
+	prompt := h.sensitiveWordsDetectionPromptGenerator(text)
+	answer, err = h.contentGeneration(ctx, prompt)
+	if err != nil {
+		return false, err
 	}
+	answer = strings.ToLower(answer)
 	if strings.Contains(answer, "true") {
 		// use the moderation handler to detect sensitive words again
 		isPass, err := h.moderationHandler.IsPass(ctx, text)
@@ -149,6 +154,9 @@ func (h *ContentModerationHandler) SensitiveWordsDetection(ctx context.Context, 
 //		`
 //	}
 func (h *ContentModerationHandler) SetContentClassificationGenerator(generator func(text string) string) {
+	if generator == nil {
+		return
+	}
 	h.contentClassificationGenerator = generator
 }
 

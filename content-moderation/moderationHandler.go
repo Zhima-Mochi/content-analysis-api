@@ -3,17 +3,20 @@ package contentModeration
 import (
 	"context"
 
+	"github.com/Zhima-Mochi/content-moderation-api/content-moderation/utils"
 	"github.com/sashabaranov/go-openai"
 )
 
 type ModerationHandler struct {
 	client *openai.Client
 	model  *string
+	judge  func(openai.ModerationResponse) bool
 }
 
 func NewModerationHandler(client *openai.Client) *ModerationHandler {
 	return &ModerationHandler{
 		client: client,
+		judge:  utils.Judge,
 	}
 }
 
@@ -23,7 +26,10 @@ func (m *ModerationHandler) IsPass(ctx context.Context, input string) (bool, err
 	if err != nil {
 		return false, err
 	}
-	categories := response.Results[0].Categories
-	scores := response.Results[0].CategoryScores
-	return !(categories.Hate || categories.HateThreatening || categories.SelfHarm || categories.Sexual || categories.SexualMinors || categories.Violence || scores.Sexual > 0.01), nil
+	return m.judge(response), nil
+}
+
+// SetJudge sets the judge of the ModerationHandler.
+func (m *ModerationHandler) SetJudge(judge func(openai.ModerationResponse) bool) {
+	m.judge = judge
 }
