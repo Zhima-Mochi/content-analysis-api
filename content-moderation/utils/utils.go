@@ -72,8 +72,8 @@ func SpamDetectionPromptGenerator(text string) string {
 	`
 }
 
-func Judge(response openai.ModerationResponse) bool {
-	categories := response.Results[0].Categories
-	scores := response.Results[0].CategoryScores
+func JudgeResult(result openai.Result) bool {
+	categories := result.Categories
+	scores := result.CategoryScores
 	return !(categories.Hate || categories.HateThreatening || categories.SelfHarm || categories.Sexual || categories.SexualMinors || categories.Violence || scores.Sexual > 0.01)
 }

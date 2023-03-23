@@ -8,15 +8,15 @@ import (
 )
 
 type ModerationHandler struct {
-	client *openai.Client
-	model  *string
-	judge  func(openai.ModerationResponse) bool
+	client      *openai.Client
+	model       *string
+	judgeResult func(openai.Result) bool
 }
 
 func NewModerationHandler(client *openai.Client) *ModerationHandler {
 	return &ModerationHandler{
-		client: client,
-		judge:  utils.Judge,
+		client:      client,
+		judgeResult: utils.JudgeResult,
 	}
 }
 
@@ -26,10 +26,10 @@ func (m *ModerationHandler) IsPass(ctx context.Context, input string) (bool, err
 	if err != nil {
 		return false, err
 	}
-	return m.judge(response), nil
+	return m.judgeResult(response.Results[0]), nil
 }
 
-// SetJudge sets the judge of the ModerationHandler.
-func (m *ModerationHandler) SetJudge(judge func(openai.ModerationResponse) bool) {
-	m.judge = judge
+// SetJudgeResult sets the judgeResult of the ModerationHandler.
+func (m *ModerationHandler) SetJudgeResult(judgeResult func(openai.Result) bool) {
+	m.judgeResult = judgeResult
 }

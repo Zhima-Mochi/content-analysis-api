@@ -30,8 +30,8 @@ func NewContentModerationHandler(client *openai.Client) *ContentModerationHandle
 	}
 }
 
-func (h *ContentModerationHandler) SetModerationHandlerJudge(judge func(openai.ModerationResponse) bool) {
-	h.moderationHandler.SetJudge(judge)
+func (h *ContentModerationHandler) SetModerationHandlerJudgeResult(judgeResult func(openai.Result) bool) {
+	h.moderationHandler.SetJudgeResult(judgeResult)
 }
 
 // SetModel sets the model of the ContentModerationHandler.
@@ -54,8 +54,8 @@ func (h *ContentModerationHandler) GetTemperature() float32 {
 	return h.temperature
 }
 
-// contentGeneration generates content based on the prompt.
-func (h *ContentModerationHandler) contentGeneration(ctx context.Context, prompt string) (string, error) {
+// getCompletionWithContent is a helper function that returns the completion with the content.
+func (h *ContentModerationHandler) getCompletionWithContent(ctx context.Context, prompt string) (string, error) {
 	req := openai.ChatCompletionRequest{
 		Model: h.model,
 		Messages: []openai.ChatCompletionMessage{
@@ -64,6 +64,22 @@ func (h *ContentModerationHandler) contentGeneration(ctx context.Context, prompt
 				Content: prompt,
 			},
 		},
+		Temperature: h.temperature,
+	}
+
+	resp, err := h.client.CreateChatCompletion(ctx, req)
+	if err != nil {
+		return "", err
+	}
+
+	return resp.Choices[0].Message.Content, nil
+}
+
+// getCompletionWithMessages is a helper function that returns the completion with the messages.
+func (h *ContentModerationHandler) getCompletionWithMessages(ctx context.Context, messages []openai.ChatCompletionMessage) (string, error) {
+	req := openai.ChatCompletionRequest{
+		Model:       h.model,
+		Messages:    messages,
 		Temperature: h.temperature,
 	}
 
@@ -110,7 +126,7 @@ func (h *ContentModerationHandler) SensitiveWordsDetection(ctx context.Context, 
 	answer := "true"
 	var err error
 	prompt := h.sensitiveWordsDetectionPromptGenerator(text)
-	answer, err = h.contentGeneration(ctx, prompt)
+	answer, err = h.getCompletionWithContent(ctx, prompt)
 	if err != nil {
 		return false, err
 	}
@@ -163,7 +179,7 @@ func (h *ContentModerationHandler) SetContentClassificationGenerator(generator f
 // ContentClassification classifies the text.
 func (h *ContentModerationHandler) ContentClassification(ctx context.Context, text string) (string, error) {
 	prompt := h.contentClassificationGenerator(text)
-	answer, err := h.contentGeneration(ctx, prompt)
+	answer, err := h.getCompletionWithContent(ctx, prompt)
 	if err != nil {
 		return "", err
 	}
