@@ -1,4 +1,4 @@
-package contentModeration
+package contentAnalysis
 
 import "errors"
 

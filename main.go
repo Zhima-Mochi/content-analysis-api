@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	contentModeration "github.com/Zhima-Mochi/content-moderation-api/content-moderation"
+	contentModeration "github.com/Zhima-Mochi/content-analysis-api/content-analysis"
 	"github.com/sashabaranov/go-openai"
 )
 

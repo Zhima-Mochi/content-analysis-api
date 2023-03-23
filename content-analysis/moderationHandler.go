@@ -1,9 +1,9 @@
-package contentModeration
+package contentAnalysis
 
 import (
 	"context"
 
-	"github.com/Zhima-Mochi/content-moderation-api/content-moderation/utils"
+	"github.com/Zhima-Mochi/content-analysis-api/content-analysis/utils"
 	"github.com/sashabaranov/go-openai"
 )
 

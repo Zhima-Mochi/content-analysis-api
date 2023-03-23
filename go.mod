@@ -1,4 +1,4 @@
-module github.com/Zhima-Mochi/content-moderation-api
+module github.com/Zhima-Mochi/content-analysis-api
 
 go 1.19
 

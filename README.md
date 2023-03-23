@@ -4,7 +4,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Introduction
-Content Moderation API, powered by OpenAI, assists developers in detecting and filtering inappropriate content, such as profanity, adult content, violence, and moral violations. This efficient, easy-to-integrate solution supports various use cases like social platforms, forums, and chat apps, ensuring a safe user experience.
+The Content Analysis API offers a comprehensive solution for social platforms, forums, and chat apps to ensure a secure user experience by detecting and filtering out inappropriate content. Additionally, it includes features for topic analysis, comparing the similarity between two articles, and summarizing articles.
 
 ## Features
 

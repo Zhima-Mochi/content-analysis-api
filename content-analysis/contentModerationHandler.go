@@ -1,10 +1,10 @@
-package contentModeration
+package contentAnalysis
 
 import (
 	"context"
 	"strings"
 
-	"github.com/Zhima-Mochi/content-moderation-api/content-moderation/utils"
+	"github.com/Zhima-Mochi/content-analysis-api/content-analysis/utils"
 	"github.com/sashabaranov/go-openai"
 )
 
@@ -176,15 +176,6 @@ func (h *ContentModerationHandler) ContentClassification(ctx context.Context, te
 	}
 
 	return answer, nil
-}
-
-// SetSpamDetectionPromptGenerator sets the prompt generator for the Spam Detection task.
-func (h *ContentModerationHandler) SetSpamDetectionPromptGenerator(generator func(text string) string) {
-	h.spamDetectionPromptGenerator = generator
-}
-
-func (h *ContentModerationHandler) SpamDetection(ctx context.Context, text string) (bool, error) {
-	return false, nil
 }
 
 func (h *ContentModerationHandler) ContentSimilarityDetection(ctx context.Context, text1, text2 string) (bool, error) {
