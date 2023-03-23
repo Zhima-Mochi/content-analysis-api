@@ -122,7 +122,6 @@ func (h *ContentModerationHandler) SetSensitiveWordsDetectionPromptGenerator(gen
 
 // SensitiveWordsDetection detects sensitive words in the text.
 func (h *ContentModerationHandler) SensitiveWordsDetection(ctx context.Context, text string) (bool, error) {
-	// two-stage detection
 	answer := "true"
 	var err error
 	prompt := h.sensitiveWordsDetectionPromptGenerator(text)
@@ -132,14 +131,6 @@ func (h *ContentModerationHandler) SensitiveWordsDetection(ctx context.Context, 
 	}
 	answer = strings.ToLower(answer)
 	if strings.Contains(answer, "true") {
-		// use the moderation handler to detect sensitive words again
-		isPass, err := h.moderationHandler.IsPass(ctx, text)
-		if err != nil {
-			return false, err
-		}
-		if isPass {
-			return false, nil
-		}
 		return true, nil
 	} else if strings.Contains(answer, "false") {
 		return false, nil
