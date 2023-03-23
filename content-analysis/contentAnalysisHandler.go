@@ -8,7 +8,7 @@ import (
 	"github.com/sashabaranov/go-openai"
 )
 
-type ContentModerationHandler struct {
+type ContentAnalysisHandler struct {
 	client                                 *openai.Client
 	model                                  string
 	temperature                            float32
@@ -18,8 +18,8 @@ type ContentModerationHandler struct {
 	moderationHandler                      *ModerationHandler
 }
 
-func NewContentModerationHandler(client *openai.Client) *ContentModerationHandler {
-	return &ContentModerationHandler{
+func NewContentAnalysisHandler(client *openai.Client) *ContentAnalysisHandler {
+	return &ContentAnalysisHandler{
 		client:                                 client,
 		model:                                  openai.GPT3Dot5Turbo0301,
 		temperature:                            0.5,
@@ -30,32 +30,32 @@ func NewContentModerationHandler(client *openai.Client) *ContentModerationHandle
 	}
 }
 
-func (h *ContentModerationHandler) SetModerationHandlerJudgeResult(judgeResult func(openai.Result) bool) {
+func (h *ContentAnalysisHandler) SetModerationHandlerJudgeResult(judgeResult func(openai.Result) bool) {
 	h.moderationHandler.SetJudgeResult(judgeResult)
 }
 
-// SetModel sets the model of the ContentModerationHandler.
-func (h *ContentModerationHandler) SetModel(model string) {
+// SetModel sets the model of the ContentAnalysisHandler.
+func (h *ContentAnalysisHandler) SetModel(model string) {
 	h.model = model
 }
 
-// GetModel returns the model of the ContentModerationHandler.
-func (h *ContentModerationHandler) GetModel() string {
+// GetModel returns the model of the ContentAnalysisHandler.
+func (h *ContentAnalysisHandler) GetModel() string {
 	return h.model
 }
 
-// SetTemperature sets the temperature of the ContentModerationHandler.
-func (h *ContentModerationHandler) SetTemperature(temperature float32) {
+// SetTemperature sets the temperature of the ContentAnalysisHandler.
+func (h *ContentAnalysisHandler) SetTemperature(temperature float32) {
 	h.temperature = temperature
 }
 
-// GetTemperature returns the temperature of the ContentModerationHandler.
-func (h *ContentModerationHandler) GetTemperature() float32 {
+// GetTemperature returns the temperature of the ContentAnalysisHandler.
+func (h *ContentAnalysisHandler) GetTemperature() float32 {
 	return h.temperature
 }
 
 // getCompletionWithContent is a helper function that returns the completion with the content.
-func (h *ContentModerationHandler) getCompletionWithContent(ctx context.Context, prompt string) (string, error) {
+func (h *ContentAnalysisHandler) getCompletionWithContent(ctx context.Context, prompt string) (string, error) {
 	req := openai.ChatCompletionRequest{
 		Model: h.model,
 		Messages: []openai.ChatCompletionMessage{
@@ -76,7 +76,7 @@ func (h *ContentModerationHandler) getCompletionWithContent(ctx context.Context,
 }
 
 // getCompletionWithMessages is a helper function that returns the completion with the messages.
-func (h *ContentModerationHandler) getCompletionWithMessages(ctx context.Context, messages []openai.ChatCompletionMessage) (string, error) {
+func (h *ContentAnalysisHandler) getCompletionWithMessages(ctx context.Context, messages []openai.ChatCompletionMessage) (string, error) {
 	req := openai.ChatCompletionRequest{
 		Model:       h.model,
 		Messages:    messages,
@@ -113,7 +113,7 @@ func (h *ContentModerationHandler) getCompletionWithMessages(ctx context.Context
 //			- is_sensitive:
 //		`
 //	}
-func (h *ContentModerationHandler) SetSensitiveWordsDetectionPromptGenerator(generator func(text string) string) {
+func (h *ContentAnalysisHandler) SetSensitiveWordsDetectionPromptGenerator(generator func(text string) string) {
 	if generator == nil {
 		return
 	}
@@ -121,7 +121,7 @@ func (h *ContentModerationHandler) SetSensitiveWordsDetectionPromptGenerator(gen
 }
 
 // SensitiveWordsDetection detects sensitive words in the text.
-func (h *ContentModerationHandler) SensitiveWordsDetection(ctx context.Context, text string) (bool, error) {
+func (h *ContentAnalysisHandler) SensitiveWordsDetection(ctx context.Context, text string) (bool, error) {
 	answer := "true"
 	var err error
 	prompt := h.sensitiveWordsDetectionPromptGenerator(text)
@@ -160,7 +160,7 @@ func (h *ContentModerationHandler) SensitiveWordsDetection(ctx context.Context, 
 //			- classification:
 //		`
 //	}
-func (h *ContentModerationHandler) SetContentClassificationGenerator(generator func(text string) string) {
+func (h *ContentAnalysisHandler) SetContentClassificationGenerator(generator func(text string) string) {
 	if generator == nil {
 		return
 	}
@@ -168,7 +168,7 @@ func (h *ContentModerationHandler) SetContentClassificationGenerator(generator f
 }
 
 // ContentClassification classifies the text.
-func (h *ContentModerationHandler) ContentClassification(ctx context.Context, text string) (string, error) {
+func (h *ContentAnalysisHandler) ContentClassification(ctx context.Context, text string) (string, error) {
 	prompt := h.contentClassificationGenerator(text)
 	answer, err := h.getCompletionWithContent(ctx, prompt)
 	if err != nil {
@@ -178,10 +178,10 @@ func (h *ContentModerationHandler) ContentClassification(ctx context.Context, te
 	return answer, nil
 }
 
-func (h *ContentModerationHandler) ContentSimilarityDetection(ctx context.Context, text1, text2 string) (bool, error) {
+func (h *ContentAnalysisHandler) ContentSimilarityDetection(ctx context.Context, text1, text2 string) (bool, error) {
 	return false, nil
 }
 
-func (h *ContentModerationHandler) ContentSummarization(ctx context.Context, text string) (string, error) {
+func (h *ContentAnalysisHandler) ContentSummarization(ctx context.Context, text string) (string, error) {
 	return "", nil
 }

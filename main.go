@@ -4,21 +4,23 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"time"
 
-	contentModeration "github.com/Zhima-Mochi/content-analysis-api/content-analysis"
+	contentAnalysis "github.com/Zhima-Mochi/content-analysis-api/content-analysis"
 	"github.com/sashabaranov/go-openai"
 )
 
-var contentModerationHandler *contentModeration.ContentModerationHandler
+var contentAnalysisHandler *contentAnalysis.ContentAnalysisHandler
 
 func init() {
 	apiKey := os.Getenv("OPENAI_API_KEY")
 
-	contentModerationHandler = contentModeration.NewContentModerationHandler(openai.NewClient(apiKey))
+	contentAnalysisHandler = contentAnalysis.NewContentAnalysisHandler(openai.NewClient(apiKey))
 }
 
 func main() {
 	ctx := context.Background()
+
 	texts := []string{
 		"我不要听话",
 		"you are so stupid",
@@ -27,14 +29,17 @@ func main() {
 		"幹你娘",
 	}
 	for _, text := range texts {
+		ctxWithTimeout, cancel := context.WithTimeout(ctx, 3*time.Second)
+		defer cancel()
+
 		fmt.Println("text: " + text)
-		result1, err := contentModerationHandler.SensitiveWordsDetection(ctx, text)
+		result1, err := contentAnalysisHandler.SensitiveWordsDetection(ctxWithTimeout, text)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
 		fmt.Println("sensitive words dectection: " + fmt.Sprintf("%v", result1))
-		// result2, err := contentModerationHandler.ContentClassification(ctx, text)
+		// result2, err := contentAnalysisHandler.ContentClassification(ctx, text)
 		// if err != nil {
 		// 	fmt.Println(err)
 		// 	return
