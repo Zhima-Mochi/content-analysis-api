@@ -50,7 +50,8 @@ func main() {
 		網友說，「春雨即將陸續抵達戰場」、「真羨慕！拜託往南壓下來些」、「再往南一點點就更好了」、「希望不要接近陸地時又減弱了」、「桃園已經刮風下雨啦，可是我還得出門」、「板橋下了一下下又停了」、「台中怎麼還沒到呢？傷心」。
 		
 		吳聖宇說，降雨從今天下半天開始就會逐漸趨於明顯，先是從北部、東北部地區開始，到了晚間下雨的範圍就會擴大到中部、花東地區，南部地區則可能要等到深夜之後到明天才會有局部降雨出現。`
-	summary, err := contentAnalysisHandler.ContentSummarization(ctx, text, "中文")
+	contentAnalysisHandler.SetUserLanguage("中文")
+	summary, err := contentAnalysisHandler.ContentSummarization(ctx, text)
 	if err != nil {
 		fmt.Println(err)
 		return

@@ -10,12 +10,13 @@ import (
 
 type ContentAnalysisHandler struct {
 	client                                 *openai.Client
+	userLanguage                           string
 	model                                  string
 	temperature                            float32
 	sensitiveWordsDetectionPromptGenerator func(text string) string
 	contentClassificationGenerator         func(text string) string
 	spamDetectionPromptGenerator           func(text string) string
-	contentSummarizaioinGenerator          func(text, language string) string
+	contentSummarizaioinGenerator          func(text string) string
 	moderationHandler                      *ModerationHandler
 }
 
@@ -23,6 +24,7 @@ func NewContentAnalysisHandler(apiKey string) *ContentAnalysisHandler {
 	client := openai.NewClient(apiKey)
 	return &ContentAnalysisHandler{
 		client:                                 client,
+		userLanguage:                           "english",
 		model:                                  openai.GPT3Dot5Turbo0301,
 		temperature:                            0.5,
 		sensitiveWordsDetectionPromptGenerator: utils.SensitiveWordsDetectionPromptGenerator,
@@ -31,6 +33,16 @@ func NewContentAnalysisHandler(apiKey string) *ContentAnalysisHandler {
 		contentSummarizaioinGenerator:          utils.ContentSummarizationPromptGenerator,
 		moderationHandler:                      NewModerationHandler(client),
 	}
+}
+
+// SetUserLanguage sets the user language of the ContentAnalysisHandler.
+func (h *ContentAnalysisHandler) SetUserLanguage(language string) {
+	h.userLanguage = language
+}
+
+// GetUserLanguage returns the user language of the ContentAnalysisHandler.
+func (h *ContentAnalysisHandler) GetUserLanguage() string {
+	return h.userLanguage
 }
 
 func (h *ContentAnalysisHandler) SetModerationHandlerJudgeResult(judgeResult func(openai.Result) bool) {
@@ -185,8 +197,11 @@ func (h *ContentAnalysisHandler) ContentSimilarityDetection(ctx context.Context,
 	return false, nil
 }
 
-func (h *ContentAnalysisHandler) ContentSummarization(ctx context.Context, text, language string) (string, error) {
-	prompt := h.contentSummarizaioinGenerator(text, language)
+func (h *ContentAnalysisHandler) ContentSummarization(ctx context.Context, text string) (string, error) {
+	prompt := h.contentSummarizaioinGenerator(text)
+	prompt += `
+	(please respond to me in ` + h.userLanguage + `)
+	`
 	answer, err := h.getCompletionWithContent(ctx, prompt)
 	if err != nil {
 		return "", err
