@@ -77,3 +77,14 @@ func JudgeResult(result openai.Result) bool {
 	scores := result.CategoryScores
 	return !(categories.Hate || categories.HateThreatening || categories.SelfHarm || categories.Sexual || categories.SexualMinors || categories.Violence || scores.Sexual > 0.01)
 }
+
+// ContentSummarizationPromptGenerator generates a prompt for the Content Summarization task.
+func ContentSummarizationPromptGenerator(text, language string) string {
+	return `
+		Summarizing the content with title and description in ` + language + ` language:
+	` + text + `
+	` + `
+	title:
+	description:
+	`
+}

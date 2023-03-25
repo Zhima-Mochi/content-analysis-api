@@ -1,6 +1,6 @@
-# content-moderation-api
+# content-analysis-api
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/Zhima-Mochi/content-moderation-api)](https://goreportcard.com/report/github.com/Zhima-Mochi/content-moderation-api)
+[![Go Report Card](https://goreportcard.com/badge/github.com/Zhima-Mochi/content-analysis-api)](https://goreportcard.com/report/github.com/Zhima-Mochi/content-analysis-api)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Introduction
@@ -14,7 +14,7 @@ The Content Analysis API offers a comprehensive solution for social platforms, f
 ## Installation
 
 ```bash
-go get github.com/Zhima-Mochi/content-moderation-api
+go get github.com/Zhima-Mochi/content-analysis-api
 ```
 
 ## Example
@@ -29,7 +29,7 @@ texts := []string{
 
 for _, text := range texts {
     fmt.Println("text: " + text)
-    result, _ := contentModerationHandler.SensitiveWordsDetection(ctx, text)
+    result, _ := contentAnalysisHandler.SensitiveWordsDetection(ctx, text)
     fmt.Println("sensitive words dectection: " + fmt.Sprintf("%v", result))
 }
 ```

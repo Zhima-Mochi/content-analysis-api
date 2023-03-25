@@ -15,6 +15,7 @@ type ContentAnalysisHandler struct {
 	sensitiveWordsDetectionPromptGenerator func(text string) string
 	contentClassificationGenerator         func(text string) string
 	spamDetectionPromptGenerator           func(text string) string
+	contentSummarizaioinGenerator          func(text, language string) string
 	moderationHandler                      *ModerationHandler
 }
 
@@ -27,6 +28,7 @@ func NewContentAnalysisHandler(apiKey string) *ContentAnalysisHandler {
 		sensitiveWordsDetectionPromptGenerator: utils.SensitiveWordsDetectionPromptGenerator,
 		contentClassificationGenerator:         utils.ContentClassificationPromptGenerator,
 		spamDetectionPromptGenerator:           utils.SpamDetectionPromptGenerator,
+		contentSummarizaioinGenerator:          utils.ContentSummarizationPromptGenerator,
 		moderationHandler:                      NewModerationHandler(client),
 	}
 }
@@ -183,6 +185,12 @@ func (h *ContentAnalysisHandler) ContentSimilarityDetection(ctx context.Context,
 	return false, nil
 }
 
-func (h *ContentAnalysisHandler) ContentSummarization(ctx context.Context, text string) (string, error) {
-	return "", nil
+func (h *ContentAnalysisHandler) ContentSummarization(ctx context.Context, text, language string) (string, error) {
+	prompt := h.contentSummarizaioinGenerator(text, language)
+	answer, err := h.getCompletionWithContent(ctx, prompt)
+	if err != nil {
+		return "", err
+	}
+
+	return answer, nil
 }
