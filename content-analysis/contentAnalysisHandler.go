@@ -18,7 +18,8 @@ type ContentAnalysisHandler struct {
 	moderationHandler                      *ModerationHandler
 }
 
-func NewContentAnalysisHandler(client *openai.Client) *ContentAnalysisHandler {
+func NewContentAnalysisHandler(apiKey string) *ContentAnalysisHandler {
+	client := openai.NewClient(apiKey)
 	return &ContentAnalysisHandler{
 		client:                                 client,
 		model:                                  openai.GPT3Dot5Turbo0301,

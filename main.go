@@ -7,7 +7,6 @@ import (
 	"time"
 
 	contentAnalysis "github.com/Zhima-Mochi/content-analysis-api/content-analysis"
-	"github.com/sashabaranov/go-openai"
 )
 
 var contentAnalysisHandler *contentAnalysis.ContentAnalysisHandler
@@ -15,7 +14,7 @@ var contentAnalysisHandler *contentAnalysis.ContentAnalysisHandler
 func init() {
 	apiKey := os.Getenv("OPENAI_API_KEY")
 
-	contentAnalysisHandler = contentAnalysis.NewContentAnalysisHandler(openai.NewClient(apiKey))
+	contentAnalysisHandler = contentAnalysis.NewContentAnalysisHandler(apiKey)
 }
 
 func main() {
