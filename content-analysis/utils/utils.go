@@ -44,11 +44,6 @@ func JudgeResult(result openai.Result) bool {
 
 // ContentSummarizationPromptGenerator generates a prompt for the Content Summarization task.
 func ContentSummarizationPromptGenerator(text string) string {
-	return `
-		Summarizing the content with title and description
-	` + text + `
-	` + `
-	title:
-	description:
-	`
+	return `Summarizing the content with title in the first line and description in the next line:
+` + text
 }

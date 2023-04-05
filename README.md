@@ -10,6 +10,7 @@ The Content Analysis API offers a comprehensive solution for social platforms, f
 
 - **Sensitivity Detection**: Detects sensitive words in text.
 - **Content Classification**: Classifies text into categories, such as `politics`, `porn`, `ad`, `violence`, `abuse`.
+- **Content Summarization**: Summarizes text into a shorter version.
 
 ## Installation
 

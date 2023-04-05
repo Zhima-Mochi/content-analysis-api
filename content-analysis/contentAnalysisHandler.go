@@ -173,7 +173,7 @@ func (h *ContentAnalysisHandler) SetContentClassificationGenerator(generator fun
 
 // ContentClassification classifies the text.
 func (h *ContentAnalysisHandler) ContentClassification(ctx context.Context, text string) (string, error) {
-	prompt := h.contentClassificationGenerator(text)
+	prompt := fmt.Sprintf("%s\n#language:%s", h.userLanguage, h.userLanguage)
 	answer, err := h.getCompletionWithContent(ctx, prompt)
 	if err != nil {
 		return "", err
@@ -182,12 +182,8 @@ func (h *ContentAnalysisHandler) ContentClassification(ctx context.Context, text
 	return answer, nil
 }
 
-func (h *ContentAnalysisHandler) ContentSimilarityDetection(ctx context.Context, text1, text2 string) (bool, error) {
-	return false, nil
-}
-
 func (h *ContentAnalysisHandler) ContentSummarization(ctx context.Context, text string) (string, error) {
-	prompt := fmt.Sprintf("#%s\n%s", h.userLanguage, h.contentSummarizaioinGenerator(text))
+	prompt := fmt.Sprintf("%s\n#language:%s", h.contentSummarizaioinGenerator(text), h.userLanguage)
 	answer, err := h.getCompletionWithContent(ctx, prompt)
 	if err != nil {
 		return "", err
