@@ -2,6 +2,7 @@ package contentAnalysis
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	"github.com/Zhima-Mochi/content-analysis-api/content-analysis/utils"
@@ -15,7 +16,6 @@ type ContentAnalysisHandler struct {
 	temperature                            float32
 	sensitiveWordsDetectionPromptGenerator func(text string) string
 	contentClassificationGenerator         func(text string) string
-	spamDetectionPromptGenerator           func(text string) string
 	contentSummarizaioinGenerator          func(text string) string
 	moderationHandler                      *ModerationHandler
 }
@@ -29,15 +29,15 @@ func NewContentAnalysisHandler(apiKey string) *ContentAnalysisHandler {
 		temperature:                            0.5,
 		sensitiveWordsDetectionPromptGenerator: utils.SensitiveWordsDetectionPromptGenerator,
 		contentClassificationGenerator:         utils.ContentClassificationPromptGenerator,
-		spamDetectionPromptGenerator:           utils.SpamDetectionPromptGenerator,
 		contentSummarizaioinGenerator:          utils.ContentSummarizationPromptGenerator,
 		moderationHandler:                      NewModerationHandler(client),
 	}
 }
 
 // SetUserLanguage sets the user language of the ContentAnalysisHandler.
-func (h *ContentAnalysisHandler) SetUserLanguage(language string) {
+func (h *ContentAnalysisHandler) SetUserLanguage(language string) error {
 	h.userLanguage = language
+	return nil
 }
 
 // GetUserLanguage returns the user language of the ContentAnalysisHandler.
@@ -45,13 +45,15 @@ func (h *ContentAnalysisHandler) GetUserLanguage() string {
 	return h.userLanguage
 }
 
-func (h *ContentAnalysisHandler) SetModerationHandlerJudgeResult(judgeResult func(openai.Result) bool) {
+func (h *ContentAnalysisHandler) SetModerationHandlerJudgeResult(judgeResult func(openai.Result) bool) error {
 	h.moderationHandler.SetJudgeResult(judgeResult)
+	return nil
 }
 
 // SetModel sets the model of the ContentAnalysisHandler.
-func (h *ContentAnalysisHandler) SetModel(model string) {
+func (h *ContentAnalysisHandler) SetModel(model string) error {
 	h.model = model
+	return nil
 }
 
 // GetModel returns the model of the ContentAnalysisHandler.
@@ -60,8 +62,9 @@ func (h *ContentAnalysisHandler) GetModel() string {
 }
 
 // SetTemperature sets the temperature of the ContentAnalysisHandler.
-func (h *ContentAnalysisHandler) SetTemperature(temperature float32) {
+func (h *ContentAnalysisHandler) SetTemperature(temperature float32) error {
 	h.temperature = temperature
+	return nil
 }
 
 // GetTemperature returns the temperature of the ContentAnalysisHandler.
@@ -79,22 +82,6 @@ func (h *ContentAnalysisHandler) getCompletionWithContent(ctx context.Context, p
 				Content: prompt,
 			},
 		},
-		Temperature: h.temperature,
-	}
-
-	resp, err := h.client.CreateChatCompletion(ctx, req)
-	if err != nil {
-		return "", err
-	}
-
-	return resp.Choices[0].Message.Content, nil
-}
-
-// getCompletionWithMessages is a helper function that returns the completion with the messages.
-func (h *ContentAnalysisHandler) getCompletionWithMessages(ctx context.Context, messages []openai.ChatCompletionMessage) (string, error) {
-	req := openai.ChatCompletionRequest{
-		Model:       h.model,
-		Messages:    messages,
 		Temperature: h.temperature,
 	}
 
@@ -128,11 +115,12 @@ func (h *ContentAnalysisHandler) getCompletionWithMessages(ctx context.Context, 
 //			- is_sensitive:
 //		`
 //	}
-func (h *ContentAnalysisHandler) SetSensitiveWordsDetectionPromptGenerator(generator func(text string) string) {
+func (h *ContentAnalysisHandler) SetSensitiveWordsDetectionPromptGenerator(generator func(text string) string) error {
 	if generator == nil {
-		return
+		return ErrorGeneratorCannotBeNil
 	}
 	h.sensitiveWordsDetectionPromptGenerator = generator
+	return nil
 }
 
 // SensitiveWordsDetection detects sensitive words in the text.
@@ -175,11 +163,12 @@ func (h *ContentAnalysisHandler) SensitiveWordsDetection(ctx context.Context, te
 //			- classification:
 //		`
 //	}
-func (h *ContentAnalysisHandler) SetContentClassificationGenerator(generator func(text string) string) {
+func (h *ContentAnalysisHandler) SetContentClassificationGenerator(generator func(text string) string) error {
 	if generator == nil {
-		return
+		return ErrorGeneratorCannotBeNil
 	}
 	h.contentClassificationGenerator = generator
+	return nil
 }
 
 // ContentClassification classifies the text.
@@ -198,10 +187,7 @@ func (h *ContentAnalysisHandler) ContentSimilarityDetection(ctx context.Context,
 }
 
 func (h *ContentAnalysisHandler) ContentSummarization(ctx context.Context, text string) (string, error) {
-	prompt := h.contentSummarizaioinGenerator(text)
-	prompt += `
-	(please respond to me in ` + h.userLanguage + `)
-	`
+	prompt := fmt.Sprintf("#%s\n%s", h.userLanguage, h.contentSummarizaioinGenerator(text))
 	answer, err := h.getCompletionWithContent(ctx, prompt)
 	if err != nil {
 		return "", err
