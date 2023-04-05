@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/Zhima-Mochi/content-analysis-api/content-analysis/utils"
+	"github.com/Zhima-Mochi/content-analysis-api/utils"
 	"github.com/sashabaranov/go-openai"
 )
 
